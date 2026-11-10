@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """State helper for /rank: select candidates and write results back.
 
 /rank reads the whole of seen_jobs.json into the model's context to filter it

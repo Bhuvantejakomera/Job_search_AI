@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """GET a page with browser headers: the 403 retry from 09-web-research.md.
 
 WebFetch sends a bot-identifying user agent and many corporate, bank and

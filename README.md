@@ -15,13 +15,14 @@
 </p>
 
 <p align="center">
-  An AI-powered job application framework built on <a href="https://claude.com/claude-code">Claude Code</a>.<br>
-  Fork it, fill in your profile, and let Claude evaluate job postings, tailor your CV,<br>
-  write cover letters, and prepare you for interviews.
+  An AI-powered job application framework built for <b>Claude Code, Google Antigravity, Codex, Cursor, and the Terminal</b>.<br>
+  Evaluate job postings, search live portals, tailor your CV and cover letters, compile clean PDFs, and track your pipeline.
 </p>
 
 <p align="center">
   <a href="#quick-start"><b>Quick start</b></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="#terminal-usage"><b>Terminal usage</b></a>
   &nbsp;&nbsp;&nbsp;
   <a href="#commands"><b>Commands</b></a>
   &nbsp;&nbsp;&nbsp;
@@ -80,17 +81,17 @@ The framework encodes career guidance best practices, including structured evalu
 
 | | |
 |---|---|
-| **[Claude Code](https://claude.com/claude-code)** | The CLI. No free tier: a Claude Pro/Max/Team subscription or Anthropic API credits (pay-per-token, usually cheaper for occasional use). |
-| **Python 3.10+** | For the tools in `tools/`. |
-| **[Bun](https://bun.sh)** | Runs the job search CLI tools. |
-| **LaTeX** | A distribution with `lualatex` and `xelatex`: [TeX Live](https://tug.org/texlive/), [MacTeX](https://tug.org/mactex/), [TinyTeX](https://yihui.org/tinytex/), or [MiKTeX](https://miktex.org/). |
+| **Agent / CLI** | **[Google Antigravity](https://deepmind.google/technologies/antigravity)** or **[Claude Code](https://claude.com/claude-code)** (or Codex / Cursor via [`AGENTS.md`](AGENTS.md)). Can also be run directly via the terminal. |
+| **Python 3.9+** | Runs deduplication, candidate filters, fetchers, and PDF compilation scripts in `tools/`. |
+| **[Bun](https://bun.sh)** | Fast TypeScript runtime for the portal search CLI tools under `.agents/skills/`. |
+| **LaTeX / PDF Engine** | **Bundled out of the box:** `tools/bin/tectonic` works with `python3 tools/build_pdf.py` without requiring a multi-gigabyte TeX installation. Alternatively, use system [TeX Live](https://tug.org/texlive/), [MacTeX](https://tug.org/mactex/), or [TinyTeX](https://yihui.org/tinytex/). |
 | **pypdf** *(optional)* | `pip install pypdf` for `/apply`'s ATS parseability check. |
 
 <details>
 <summary>Fine print: other agents, LaTeX engines, PDF text extraction</summary>
 
-- **Using a different agent tool** (Codex, Antigravity, Gemini CLI)? Start at [`AGENTS.md`](AGENTS.md) - the portal search skills work there out of the box, and [community forks](https://github.com/ai-job-search-dev/ai-job-search/discussions/78) adapt the full workflow.
-- **LaTeX engines.** The CV compiles with `lualatex` (pdflatex often fails on modern MiKTeX installs with `fontawesome5` font-expansion errors); the cover letter compiles with `xelatex` because `cover.cls` requires `fontspec`. If using a minimal TeX install such as TinyTeX or BasicTeX, install the extra packages listed in [SETUP.md](SETUP.md#minimal-tex-install-tinytexbasictex).
+- **Using a different agent tool** (Google Antigravity, Codex, Cursor, Gemini CLI)? Start at [`AGENTS.md`](AGENTS.md) - the candidate profile in `CLAUDE.md` and workflow specifications under `.claude/` serve as the canonical single source of truth across all runtimes.
+- **LaTeX engines.** You can compile any `.tex` file directly using `python3 tools/build_pdf.py <path.tex>`. It automatically utilizes the bundled `tools/bin/tectonic` compiler, or falls back to system `xelatex`/`lualatex`.
 - **PDF text extraction.** `pypdf` is BSD-licensed and needs no Poppler. Poppler `pdftotext` remains a fallback (macOS: `brew install poppler`, Debian/Ubuntu: `apt install poppler-utils`, Windows: `choco install poppler`). If both are missing, the check degrades to a visual keyword review.
 
 </details>
@@ -160,6 +161,82 @@ This runs the full workflow: evaluate fit, draft CV + cover letter, review with 
 
 > [!WARNING]
 > Postings are treated as untrusted input (the workflow follows no instructions embedded in them and fetches no links from their body), but agentic defenses are instruction-level, not a sandbox - on an unfamiliar job board, skim what was fetched and written before you hit send. Details in [SECURITY.md](SECURITY.md).
+
+## Terminal usage
+
+You can execute searches, compile documents, and manage states directly in your terminal without requiring an AI agent session.
+
+### 1. Install Bun (TypeScript runtime)
+If Bun is not already installed on your Mac or Linux system:
+```bash
+curl -fsSL https://bun.sh/install | bash
+source ~/.zshrc
+```
+
+### 2. Live Job Search CLIs
+
+#### Search LinkedIn Jobs
+Public, unauthenticated search across LinkedIn:
+```bash
+# Search Generative AI jobs in India (posted in the last 14 days)
+bun run .agents/skills/linkedin-search/cli/src/cli.ts search \
+  --location "India" \
+  --query "Generative AI" \
+  --jobage 14 \
+  --limit 10
+
+# Search Remote LLM Engineer roles
+bun run .agents/skills/linkedin-search/cli/src/cli.ts search \
+  --location "Remote" \
+  --query "LLM Engineer" \
+  --jobage 14 \
+  --limit 10
+```
+
+#### Search Freehire ATS Aggregator
+Search 50+ ATS platforms (Greenhouse, Lever, Ashby, Workday) normalized into one schema:
+```bash
+# Search AI Engineer & Generative AI roles in India
+bun run .agents/skills/freehire-search/cli/src/cli.ts search \
+  -q 'title:"AI Engineer" OR title:"Generative AI"' \
+  --country IN \
+  --jobage 14 \
+  --limit 15
+
+# View in formatted table format
+bun run .agents/skills/freehire-search/cli/src/cli.ts search \
+  -q "PyTorch Vision Transformer" \
+  --country IN \
+  --format table
+```
+
+### 3. Compile CV and Cover Letter PDFs
+
+Compile LaTeX `.tex` files directly into PDFs using the bundled `tectonic` compiler (located in `tools/bin/tectonic`):
+```bash
+# Compile a specific CV or cover letter
+python3 tools/build_pdf.py cv/main_juicelabs_ai.tex
+python3 tools/build_pdf.py cover_letters/cover_juicelabs_ai.tex
+
+# Compile all CVs and cover letters in the repository
+python3 tools/build_pdf.py --all
+```
+
+### 4. Deduplication & Scraper State Management
+
+```bash
+# Generate a canonical deduplication key
+python3 tools/job_key.py --company "Company Name" --title "Role Title" --url "https://posting.url"
+
+# Filter promising candidates against seen_jobs.json and job_search_tracker.csv
+python3 tools/scrape_state.py candidates --results <path-to-json-results>
+
+# Atomically record new postings into job_scraper/seen_jobs.json
+python3 tools/scrape_state.py store --results <path-to-json-results>
+
+# Safely fetch a job page text with browser headers and robots.txt check
+python3 tools/fetch_page.py "<URL>" --text --max-chars 3000
+```
 
 ## Commands
 
@@ -284,10 +361,11 @@ Give it your local job board's URL. The command investigates the portal (search-
 
 Maintaining a fork adapted to your market or language? Add it to the [Community forks & adaptations](https://github.com/ai-job-search-dev/ai-job-search/discussions/78) thread so others can find it.
 
-For **country-agnostic** starting points outside Denmark, the repo ships two portal skills alongside the Danish demos:
+For **India and global tech roles**, the repo provides three portal skills ready to use:
 
-- **`linkedin-search`** — built on LinkedIn's public, unauthenticated `jobs-guest` endpoints. Field-agnostic, **zero runtime dependencies** (runs with just `bun`), and takes the search location as an explicit flag, so it works for any market out of the box (`-l "Berlin, Germany"`, `-l "Mumbai, Maharashtra, India"`, `-l "Remote"`, …). Intended for **personal use only** — automated access is against LinkedIn's Terms of Service, so keep volume low. See `.agents/skills/linkedin-search/SKILL.md`.
-- **`freehire-search`** — queries the [freehire.me](https://freehire.me) aggregator's public REST API (JSON, no API key). Tech-focused (software, data, engineering, DevOps, remote), multi-market via facet flags (`--region`, `--country`, `--remote`), and **zero runtime dependencies**. Unlike the HTML-scraping Danish portals, results come back structured (skills, seniority, category). The backend is MIT-licensed and [self-hostable](https://github.com/strelov1/freehire) — point `FREEHIRE_API_URL` at your own instance if you prefer. See `.agents/skills/freehire-search/SKILL.md`.
+- **`linkedin-search`** — built on LinkedIn's public, unauthenticated `jobs-guest` endpoints. Field-agnostic, **zero runtime dependencies** (runs with just `bun`), and takes the search location as an explicit flag, so it works for any market out of the box (`-l "India"`, `-l "Bangalore"`, `-l "Remote"`, …). Intended for **personal use only** — keep volume low. See `.agents/skills/linkedin-search/SKILL.md`.
+- **`freehire-search`** — queries the [freehire.me](https://freehire.me) aggregator's public REST API (JSON, no API key). Tech-focused (AI, ML, backend, fullstack, DevOps, remote), multi-market via facet flags (`--country IN`, `--remote`, `--jobage 14`), and **zero runtime dependencies**. Returns full rich descriptions directly. See `.agents/skills/freehire-search/SKILL.md`.
+- **`indeed-search`** — tailored queries targeting active job postings on Indeed (`in.indeed.com` / `indeed.com`) for Generative AI, Machine Learning, Python, and Data Science positions. See `.agents/skills/indeed-search/SKILL.md`.
 
 ### Extending the framework: portals, templates, criteria - and borrowing from other forks
 
