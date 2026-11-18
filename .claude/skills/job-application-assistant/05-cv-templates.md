@@ -6,87 +6,123 @@ framework_version: 1.4.8
 
 <!-- SETUP: Profile statements and section ordering are personalized by running /setup -->
 
-## Template: LaTeX moderncv (Banking Style)
+## Template: Canonical Technical Resume (Clean Overleaf / Roboto Style)
 
-All CVs use the moderncv LaTeX package with the "banking" style and "blue" color scheme.
+All CVs use the clean, professional, single/two-page technical article template (Jake's Resume / Overleaf standard format) with **Roboto** font (`\usepackage[sfdefault]{roboto}`) or Latin Modern serif, 0.5-inch margins, crisp horizontal section rules (`\titlerule`), and strictly black typography. No moderncv pastel blues, bubble icons, or cartoonish styling.
 
 **Output file:** `cv/main_<company>_<role>.tex`
-**Compile with:** **lualatex** on MiKTeX/TeX Live. pdflatex often fails on modern MiKTeX installs with `fontawesome5` font-expansion errors; lualatex handles the same sources cleanly.
-**Master reference:** `cv/main_example.tex` (comprehensive CV with all competencies, experience, and achievements - use as source when building targeted CVs)
+**Compile with:** `python3 tools/build_pdf.py cv/main_<company>_<role>.tex` (uses bundled standalone `tools/bin/tectonic` or system xelatex/lualatex).
+**Master reference:** `cv/main.tex` (Komera Bhuvan Teja's master profile) and `cv/main_example.tex` (generic template).
 
 ### Compile command
 
 ```bash
-cd cv && lualatex -interaction=nonstopmode main_<company>_<role>.tex
+python3 tools/build_pdf.py cv/main_<company>_<role>.tex
+python3 tools/verify_pdf.py cv/main_<company>_<role>.pdf --pages 2 --ascii-dates
 ```
 
-Expected output: `Output written on main_<company>_<role>.pdf (2 pages, ...)`. Any page count other than 2 is a failure that must be fixed before presenting to the user.
+Expected output: `✓ Generated: cv/main_<company>_<role>.pdf (2 pages)`. Any page count other than 2 is a failure that must be adjusted before presenting to the user.
 
 ## Document Structure
 
 ```latex
-\documentclass[11pt,a4paper,sans]{moderncv}
-\moderncvstyle{banking}
-\moderncvcolor{blue}
+\documentclass[letterpaper,10pt]{article}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[sfdefault]{roboto}
 
-% Force the name and section headings to render in moderncv blue (color1).
-% Default banking leaves them black: moderncvstylebanking.sty's \colorlet
-% copies (not aliases) the pre-scheme accent colour, so the name colours are
-% frozen before \moderncvcolor runs. Re-let them after. \namefont is the hook
-% every name-style macro routes through, so this also works on moderncv 2.3.1
-% (Debian/Ubuntu apt), which has no \firstnamestyle/\lastnamestyle at all.
-\renewcommand*{\namefont}{\fontsize{34}{36}\bfseries\upshape}
-\colorlet{firstnamecolor}{color1}
-\colorlet{lastnamecolor}{color1}
-\colorlet{namecolor}{color1}
-\renewcommand*{\sectionstyle}[1]{{\sectionfont\color{color1}#1}}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
 
-\usepackage[utf8]{inputenc}
-% pdflatex fallback only (the documented engine is lualatex, which skips this
-% branch). Without T1 font encoding pdflatex builds accented letters with
-% \accent, and the PDF text layer stores them decomposed - `e` + U+0300 rather
-% than U+00E8 - so an ATS keyword match on "Genève" fails while the page looks
-% right. moderncv 2.5 loads T1 itself under pdflatex; 2.3.1 (Debian/Ubuntu apt)
-% does not. \ifpdftex comes from iftex, which every moderncv version loads.
-\ifpdftex\usepackage[T1]{fontenc}\fi
-% moderncv loads hyperref itself in an \AtEndPreamble hook, so \hypersetup
-% must go in an \AtEndPreamble of our own: on moderncv < 2.4 a top-level
-% \usepackage{hyperref} clashes with the class's own
-% \RequirePackage[unicode]{hyperref}. From 2.4.0 the class passes its options
-% through \PassOptionsToPackage instead, which is what removes that clash.
-\AtEndPreamble{\hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    filecolor=magenta,
-    urlcolor=blue,
-    pdftitle={[YOUR_NAME] - CV},
-    % Keep pdfpagemode=UseNone: this block runs after moderncv's own
-    % \AtEndPreamble (moderncv.cls sets pdfpagemode there), so a FullScreen
-    % value here would win and open every CV in fullscreen presentation mode.
-    pdfpagemode=UseNone,
-}}
-\usepackage[scale=0.80]{geometry}
-\usepackage{import}
+\urlstyle{same}
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{4pt}
 
-% Personal data
-\name{[FIRST_NAME]}{[LAST_NAME]}
-% If you have no address to list, DELETE this whole line. \address{}{}{} fails
-% with "There's no line here to end" on every moderncv version.
-\address{[YOUR_ADDRESS]}{}{}
-\phone[mobile]{[YOUR_PHONE]}
-\email{[YOUR_EMAIL]}
-\extrainfo{\href{[YOUR_LINKEDIN_URL]}{LinkedIn}, \href{[YOUR_GITHUB_URL]}{GitHub}}
+% Section format: clean, bold, uppercase with black horizontal rule
+\titleformat{\section}{\vspace{-4pt}\large\bfseries\raggedright}{}{0em}{}[\color{black}\titlerule \vspace{-4pt}]
+
+% Bullet styling
+\setlist[itemize]{leftmargin=12pt, label={\small\textbullet}, noitemsep, topsep=1pt}
 
 \begin{document}
-\makecvtitle
 
-% 1. Profile statement (1-3 sentences, tailored per role)
-% 2. Skills section
-% 3. Education section
-% 4. Professional Experience section
-% 5. Selected Publications (if applicable)
-% 6. Honors and Awards (if applicable)
-% 7. References
+\begin{center}
+    {\Huge \textbf{[FIRST] [LAST]}} \\ \vspace{3pt}
+    \small [+XX XXXXXXXXXX] \quad$|$\quad
+    \href{mailto:your.email@example.com}{\underline{your.email@example.com}} \quad$|$\quad
+    \href{https://linkedin.com/in/your-profile}{\underline{LinkedIn}} \quad$|$\quad
+    \href{https://github.com/your-username}{\underline{GitHub}}
+\end{center}
+
+\vspace{-4pt}
+\section*{SUMMARY}
+\small{[A 2-3 sentence overview tailored to the target role.]}
+
+\section*{TECHNICAL SKILLS}
+\vspace{-2pt}
+\begin{minipage}[t]{0.49\textwidth}
+\begin{itemize}[leftmargin=10pt, noitemsep, topsep=0pt]
+    \item \textbf{[Primary Domain]}: [Skills, frameworks, libraries]
+    \item \textbf{[Secondary Domain]}: [Skills, frameworks, libraries]
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.49\textwidth}
+\begin{itemize}[leftmargin=10pt, noitemsep, topsep=0pt]
+    \item \textbf{Programming Languages}: [Languages]
+    \item \textbf{Databases \& Cloud}: [Databases, tools]
+\end{itemize}
+\end{minipage}
+
+\vspace{4pt}
+\section*{EDUCATION DETAILS}
+\vspace{-2pt}
+{\small
+\begin{tabularx}{\textwidth}{|p{2.6cm}|X|X|c|c|c|}
+\hline
+\textbf{Course Name} & \textbf{Institute Name} & \textbf{University Name} & \textbf{Year of Passing} & \textbf{Score Details (\%/CGPA)} & \textbf{Course Type} \\ \hline
+[Master's Degree] & [Institute] & [University] & [Year] & [GPA] & Full-time \\ \hline
+[Bachelor's Degree] & [Institute] & [University] & [Year] & [GPA] & Full-time \\ \hline
+\end{tabularx}
+}
+
+\section*{PROJECTS}
+\vspace{-2pt}
+\noindent\begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+\textbf{[Project Title]} & \small{[Dates]}
+\end{tabular*}
+\vspace{-4pt}
+\begin{itemize}[leftmargin=12pt, label={--}, noitemsep, topsep=1pt]
+    \item [Tailored impact bullet using bold technical keywords.]
+\end{itemize}
+
+\section*{EXPERIENCE \& INTERNSHIPS}
+\vspace{-2pt}
+\noindent\begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+\textbf{[Role Title]} & \small{[Dates]} \\
+\textit{\small [Company Name]} & \textit{\small [Location]}
+\end{tabular*}
+\vspace{-4pt}
+\begin{itemize}[leftmargin=12pt, label={--}, noitemsep, topsep=1pt]
+    \item [Tailored impact bullet.]
+\end{itemize}
+
+\section*{CERTIFICATIONS}
+\vspace{-2pt}
+\begin{itemize}[leftmargin=12pt, label={\small\textbullet}, noitemsep, topsep=1pt]
+    \item [Certifications]
+\end{itemize}
+
+\section*{LANGUAGES}
+\vspace{-2pt}
+\noindent [Languages]
 
 \end{document}
 ```

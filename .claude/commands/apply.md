@@ -110,7 +110,7 @@ Also read the most recent existing CV and cover letter files for concrete struct
 
 ### CV (`cv/main_<company>_<role><CV_EXT>`)
 - In the **CV language from the profile** (the `CV language:` line in CLAUDE.md's Identity section). When the profile does not set one, default to **English**. Never switch language per posting - the CV language is a profile-level choice, so all CVs stay consistent and reusable
-- Follow the moderncv/banking format from `05-cv-templates.md`
+- Follow the canonical technical resume format from `05-cv-templates.md` (clean Overleaf / Roboto style, strict 2 pages)
 - Tailor the profile statement and experience bullets to the specific role
 - Reframe skills and achievements to match job requirements
 - Keep to 2 pages
