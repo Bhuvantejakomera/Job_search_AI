@@ -12,7 +12,7 @@ All CVs use the clean, professional, single/two-page technical article template 
 
 **Output file:** `cv/main_<company>_<role>.tex`
 **Compile with:** `python3 tools/build_pdf.py cv/main_<company>_<role>.tex` (uses bundled standalone `tools/bin/tectonic` or system xelatex/lualatex).
-**Master reference:** `cv/main.tex` (Komera Bhuvan Teja's master profile) and `cv/main_example.tex` (generic template).
+**Master reference:** `cv/main_example.tex` (comprehensive template - use as source when building targeted CVs) and `cv/main.tex` (your master profile).
 
 ### Compile command
 
