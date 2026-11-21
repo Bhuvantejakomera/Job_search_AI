@@ -1,10 +1,6 @@
 # Job Search AI
 
 <p align="center">
-  <img src="assets/readme/hero.svg" alt="Job Search AI - Agentic Job Application Framework" width="100%">
-</p>
-
-<p align="center">
   <a href="https://github.com/Bhuvantejakomera/Job_search_AI/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-2A9D8F?style=flat" alt="MIT license"></a>
   &nbsp;
   <a href="https://deepmind.google/technologies/antigravity"><img src="https://img.shields.io/badge/Agent-Google_Antigravity-4285F4?style=flat&logo=google" alt="Google Antigravity"></a>
